@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronographe Automobile — 1900</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0e0800;
+      background-image: radial-gradient(ellipse at 50% 30%, #1c1000 0%, #050300 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IM Fell English', serif;
+    }
+
+    .scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .maker-mark {
+      color: #a07830;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .title {
+      color: #d4a84b;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      font-style: italic;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 24px rgba(212,168,75,0.45);
+      margin-top: -4px;
+    }
+
+    /* Winding crown */
+    .crown-assembly {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: -14px;
+      z-index: 5;
+      position: relative;
+    }
+    .chain-link {
+      width: 14px;
+      height: 22px;
+      border: 3px solid #b8860b;
+      border-radius: 7px;
+      background: transparent;
+      box-shadow: inset 0 1px 2px rgba(255,215,0,0.15);
+    }
+    .crown-stem {
+      width: 28px;
+      height: 12px;
+      background: linear-gradient(to bottom, #d4a84b, #8b6510, #d4a84b);
+      border-radius: 3px 3px 0 0;
+    }
+    .crown-knob {
+      width: 38px;
+      height: 18px;
+      background: linear-gradient(135deg, #ffe066, #c8900a, #ffe066, #8b6510);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 6px rgba(255,210,0,0.2);
+      margin-top: -2px;
+    }
+
+    /* Watch outer case */
+    .watch-case {
+      width: 390px;
+      height: 390px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 32%, #2a1c06, #0e0800);
+      position: relative;
+      box-shadow:
+        0 0 0 4px #6b4c0a,
+        0 0 0 7px #c8900a,
+        0 0 0 10px #6b4c0a,
+        0 0 0 14px #3a2800,
+        0 0 60px rgba(200,144,10,0.18),
+        inset 0 0 80px rgba(0,0,0,0.6);
+    }
+
+    /* Engraved bezel ring */
+    .bezel-ring {
+      position: absolute;
+      inset: 14px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #c8900a 0deg, #8b6510 15deg, #e8b830 30deg, #8b6510 45deg,
+        #c8900a 60deg, #8b6510 75deg, #e8b830 90deg, #8b6510 105deg,
+        #c8900a 120deg, #8b6510 135deg, #e8b830 150deg, #8b6510 165deg,
+        #c8900a 180deg, #8b6510 195deg, #e8b830 210deg, #8b6510 225deg,
+        #c8900a 240deg, #8b6510 255deg, #e8b830 270deg, #8b6510 285deg,
+        #c8900a 300deg, #8b6510 315deg, #e8b830 330deg, #8b6510 345deg,
+        #c8900a 360deg
+      );
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
+    }
+
+    /* Watch face — ivory parchment */
+    .watch-face {
+      position: absolute;
+      inset: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 42% 35%, #f7eed8, #e8d5a8, #c8a85a, #8b6810);
+      overflow: hidden;
+      box-shadow:
+        inset 0 3px 12px rgba(255,255,255,0.25),
+        inset 0 -6px 20px rgba(0,0,0,0.35);
+    }
+
+    /* Patina overlay */
+    .watch-face::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 60% 20%, rgba(255,255,220,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 80%, rgba(100,60,0,0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Outer minute track */
+    .minute-track {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(80,50,10,0.4);
+      box-shadow: inset 0 0 0 1px rgba(80,50,10,0.2);
+    }
+
+    /* Tick SVG layer */
+    #tickSvg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    /* Minute numerals */
+    .min-numeral {
+      position: absolute;
+      font-family: 'IM Fell English', serif;
+      font-size: 0.78rem;
+      color: #2a1800;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Central car illustration */
+    .car-area {
+      position: absolute;
+      top: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76%;
+      height: 42%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Sub-dial for seconds */
+    .sub-dial {
+      position: absolute;
+      bottom: 17%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 72px;
+    }
+    .sub-dial-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #e8d5a8, #b89040);
+      border: 1.5px solid #6b4a10;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.4);
+    }
+    #subTickSvg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .sub-label {
+      position: absolute;
+      bottom: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'IM Fell English', serif;
+      font-size: 0.48rem;
+      color: #4a2e0a;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Main minute hand */
+    .hands {
+      position: absolute;
+      inset: 0;
+    }
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+    }
+    .minute-hand {
+      width: 5px;
+      margin-left: -2.5px;
+      height: 118px;
+      background: linear-gradient(to top, #5a3a00 0%, #2a1800 60%, #1a0e00 100%);
+      border-radius: 4px 4px 1px 1px;
+      box-shadow: 1px 0 3px rgba(0,0,0,0.4);
+    }
+    .minute-hand::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 14px;
+      background: #3a2200;
+      border-radius: 2px;
+    }
+
+    /* Sub-dial second hand */
+    .sub-hands {
+      position: absolute;
+      inset: 0;
+    }
+    .sub-hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+    }
+    .sec-hand {
+      width: 1.5px;
+      margin-left: -0.75px;
+      height: 28px;
+      background: #8b0000;
+      border-radius: 2px 2px 0 0;
+    }
+    .sec-hand::before {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1.5px;
+      height: 12px;
+      background: #8b0000;
+    }
+
+    /* Center jewel */
+    .center-jewel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 35% 30%, #ffe066, #c8900a, #6b4c0a);
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(200,144,10,0.6), 0 1px 3px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+    .sub-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle at 35% 30%, #ffe066, #8b6510);
+      border-radius: 50%;
+      z-index: 10;
+    }
+
+    /* Brand text on dial */
+    .dial-brand {
+      position: absolute;
+      top: 11%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .dial-brand .maker {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.7rem;
+      font-style: italic;
+      color: #3a2408;
+      letter-spacing: 0.15em;
+      opacity: 0.8;
+    }
+
+    /* Elapsed minutes display */
+    .elapsed-display {
+      position: absolute;
+      top: 57%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      background: rgba(232,213,168,0.7);
+      border: 1px solid rgba(107,74,16,0.6);
+      border-radius: 4px;
+      padding: 2px 12px;
+      min-width: 88px;
+    }
+    .elapsed-display .mins-val {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.2rem;
+      color: #1e1000;
+      line-height: 1.2;
+    }
+    .elapsed-display .unit {
+      font-size: 0.5rem;
+      color: #5a3810;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn {
+      font-family: 'IM Fell English', serif;
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      padding: 9px 24px;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: all 0.12s;
+      position: relative;
+    }
+
+    .btn-start {
+      background: linear-gradient(160deg, #3d6e30, #224016);
+      color: #c8e8b8;
+      box-shadow: 0 4px 0 #102008, 0 0 12px rgba(50,110,40,0.3);
+    }
+    .btn-start:hover { transform: translateY(-1px); }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 #102008; }
+
+    .btn-stop {
+      background: linear-gradient(160deg, #7a2e2e, #4a1010);
+      color: #f0c8c8;
+      box-shadow: 0 4px 0 #280808, 0 0 12px rgba(120,40,40,0.3);
+    }
+    .btn-stop:hover { transform: translateY(-1px); }
+    .btn-stop:active { transform: translateY(2px); box-shadow: 0 2px 0 #280808; }
+
+    .btn-reset {
+      background: linear-gradient(160deg, #5c4a1e, #2e2408);
+      color: #e8d8a0;
+      box-shadow: 0 4px 0 #100e00, 0 0 12px rgba(90,74,30,0.3);
+    }
+    .btn-reset:hover { transform: translateY(-1px); }
+    .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #100e00; }
+
+    .status-line {
+      color: #a07830;
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      height: 14px;
+      font-style: italic;
+    }
+
+    /* Dust/exhaust puff animation on the car when running */
+    @keyframes puff-anim {
+      0%   { opacity: 0; transform: scale(0.4) translateX(0); }
+      30%  { opacity: 0.7; }
+      100% { opacity: 0; transform: scale(1.6) translateX(-18px) translateY(-8px); }
+    }
+    .exhaust-puff {
+      animation: puff-anim 1.8s ease-out infinite;
+      transform-origin: center;
+    }
+    .exhaust-puff.p2 { animation-delay: 0.6s; }
+    .exhaust-puff.p3 { animation-delay: 1.2s; }
+
+    /* Wheel spin when running */
+    @keyframes wheel-spin {
+      from { transform-origin: center; transform: rotate(0deg); }
+      to   { transform-origin: center; transform: rotate(360deg); }
+    }
+    .wheel-spin {
+      animation: wheel-spin 0.8s linear infinite;
+    }
+
+    /* Idle: no animation */
+    .idle .exhaust-puff { animation-play-state: paused; }
+    .idle .wheel-spin   { animation-play-state: paused; }
+  </style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="maker-mark">Maison Horlogère de l'Automobile</div>
+  <div class="title">Chronographe des Grandes Routes — 1900</div>
+
+  <!-- Crown assembly -->
+  <div class="crown-assembly">
+    <div class="chain-link"></div>
+    <div class="crown-stem"></div>
+    <div class="crown-knob"></div>
+  </div>
+
+  <!-- Main watch case -->
+  <div class="watch-case">
+    <div class="bezel-ring"></div>
+
+    <div class="watch-face" id="watchFace">
+      <div class="minute-track"></div>
+
+      <!-- Tick marks (SVG) -->
+      <svg id="tickSvg" viewBox="0 0 346 346" xmlns="http://www.w3.org/2000/svg"></svg>
+
+      <!-- Minute numerals -->
+      <div id="numerals"></div>
+
+      <!-- Maker text -->
+      <div class="dial-brand">
+        <div class="maker">Paris &amp; Londres</div>
+      </div>
+
+      <!-- Car SVG illustration -->
+      <div class="car-area" id="carArea">
+        <svg viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+
+          <!-- Exhaust smoke puffs (left side) -->
+          <ellipse class="exhaust-puff p3" cx="18" cy="52" rx="7" ry="5" fill="rgba(160,140,100,0.5)"/>
+          <ellipse class="exhaust-puff p2" cx="14" cy="48" rx="5" ry="4" fill="rgba(160,140,100,0.4)"/>
+          <ellipse class="exhaust-puff"    cx="10" cy="43" rx="4" ry="3" fill="rgba(160,140,100,0.35)"/>
+
+          <!-- Road shadow -->
+          <ellipse cx="110" cy="98" rx="88" ry="6" fill="rgba(0,0,0,0.18)"/>
+
+          <!-- ============ REAR WHEEL (large, spoked) ============ -->
+          <g transform="translate(52,78)">
+            <!-- Tyre -->
+            <circle cx="0" cy="0" r="26" fill="#1a1000" stroke="#2a1800" stroke-width="2"/>
+            <circle cx="0" cy="0" r="23" fill="none" stroke="#3a2800" stroke-width="1"/>
+            <!-- Spokes -->
+            <g class="wheel-spin">
+              <line x1="0" y1="-20" x2="0"  y2="20"  stroke="#6b4c0a" stroke-width="2"/>
+              <line x1="-20" y1="0" x2="20" y2="0"   stroke="#6b4c0a" stroke-width="2"/>
+              <line x1="-14" y1="-14" x2="14" y2="14" stroke="#6b4c0a" stroke-width="2"/>
+              <line x1="14"  y1="-14" x2="-14" y2="14" stroke="#6b4c0a" stroke-width="2"/>
+            </g>
+            <!-- Hub -->
+            <circle cx="0" cy="0" r="5"  fill="radial-gradient(circle,#d4a84b,#6b4c0a)"/>
+            <circle cx="0" cy="0" r="5"  fill="#c8900a"/>
+            <circle cx="0" cy="0" r="2.5" fill="#8b6510"/>
+          </g>
+
+          <!-- ============ FRONT WHEEL (smaller) ============ -->
+          <g transform="translate(172,82)">
+            <!-- Tyre -->
+            <circle cx="0" cy="0" r="20" fill="#1a1000" stroke="#2a1800" stroke-width="2"/>
+            <circle cx="0" cy="0" r="17" fill="none" stroke="#3a2800" stroke-width="1"/>
+            <!-- Spokes -->
+            <g class="wheel-spin">
+              <line x1="0" y1="-14" x2="0"  y2="14"  stroke="#6b4c0a" stroke-width="1.5"/>
+              <line x1="-14" y1="0" x2="14" y2="0"   stroke="#6b4c0a" stroke-width="1.5"/>
+              <line x1="-10" y1="-10" x2="10" y2="10" stroke="#6b4c0a" stroke-width="1.5"/>
+              <line x1="10"  y1="-10" x2="-10" y2="10" stroke="#6b4c0a" stroke-width="1.5"/>
+            </g>
+            <!-- Hub -->
+            <circle cx="0" cy="0" r="4"  fill="#c8900a"/>
+            <circle cx="0" cy="0" r="2"  fill="#8b6510"/>
+          </g>
+
+          <!-- ============ CHASSIS / BODY ============ -->
+          <!-- Running board / frame -->
+          <rect x="38" y="64" width="148" height="6" rx="2"
+                fill="#4a3010" stroke="#6b4c0a" stroke-width="0.8"/>
+
+          <!-- Rear mudguard -->
+          <path d="M 30 62 Q 50 50 78 58 L 78 66 Q 48 62 34 70 Z"
+                fill="#3a2808" stroke="#5a3c10" stroke-width="0.7"/>
+
+          <!-- Main body — tonneau shape -->
+          <path d="M 58 64 L 58 32 Q 60 20 80 18 L 140 18 Q 165 18 168 32 L 168 64 Z"
+                fill="#3a2808" stroke="#5a3c10" stroke-width="1"/>
+
+          <!-- Body highlight / panel -->
+          <path d="M 64 62 L 64 34 Q 66 24 82 22 L 138 22 Q 160 22 162 34 L 162 62 Z"
+                fill="#4a3412" stroke="none" opacity="0.5"/>
+
+          <!-- Bonnet / engine cover -->
+          <path d="M 58 38 L 58 60 L 38 60 L 38 48 Q 40 35 58 38 Z"
+                fill="#3a2808" stroke="#5a3c10" stroke-width="1"/>
+          <!-- Bonnet louvers -->
+          <line x1="42" y1="44" x2="55" y2="43" stroke="#6b4c0a" stroke-width="1" opacity="0.7"/>
+          <line x1="42" y1="48" x2="55" y2="47" stroke="#6b4c0a" stroke-width="1" opacity="0.7"/>
+          <line x1="42" y1="52" x2="55" y2="51" stroke="#6b4c0a" stroke-width="1" opacity="0.7"/>
+
+          <!-- Exhaust pipe -->
+          <path d="M 30 54 Q 24 54 20 52" stroke="#5a4020" stroke-width="3"
+                fill="none" stroke-linecap="round"/>
+
+          <!-- Front mudguard -->
+          <path d="M 152 62 Q 168 50 190 56 L 192 64 Q 174 60 154 68 Z"
+                fill="#3a2808" stroke="#5a3c10" stroke-width="0.7"/>
+
+          <!-- Windscreen / glass -->
+          <rect x="132" y="22" width="28" height="20" rx="2"
+                fill="rgba(180,220,240,0.25)" stroke="#6b4c0a" stroke-width="1.2"/>
+          <!-- Windscreen frame -->
+          <rect x="132" y="22" width="28" height="20" rx="2"
+                fill="none" stroke="#8b6510" stroke-width="1.5"/>
+
+          <!-- Seats -->
+          <!-- Rear bench -->
+          <rect x="70"  y="32" width="50" height="14" rx="3" fill="#1e1208"/>
+          <rect x="70"  y="28" width="50" height="6"  rx="2" fill="#2a1a0a"/>
+          <!-- Front seat -->
+          <rect x="122" y="34" width="30" height="12" rx="3" fill="#1e1208"/>
+          <rect x="122" y="30" width="30" height="6"  rx="2" fill="#2a1a0a"/>
+
+          <!-- ============ DRIVER (with goggles & duster coat) ============ -->
+          <!-- Coat / body -->
+          <ellipse cx="148" cy="46" rx="13" ry="16" fill="#4a3a1a"/>
+          <!-- Coat collar -->
+          <path d="M 138 36 Q 148 32 158 36 L 155 42 Q 148 38 141 42 Z"
+                fill="#5a4a2a" stroke="#3a2c12" stroke-width="0.5"/>
+          <!-- Head -->
+          <circle cx="148" cy="22" r="10" fill="#d4a870"/>
+          <!-- Driving cap / helmet -->
+          <ellipse cx="148" cy="16" rx="11" ry="7" fill="#2a1e08"/>
+          <rect x="138" y="15" width="20" height="4" rx="1" fill="#1a1204"/>
+          <!-- Goggles -->
+          <ellipse cx="144" cy="23" rx="5" ry="4" fill="rgba(150,200,220,0.4)"
+                   stroke="#5a3c10" stroke-width="1.2"/>
+          <ellipse cx="152" cy="23" rx="5" ry="4" fill="rgba(150,200,220,0.4)"
+                   stroke="#5a3c10" stroke-width="1.2"/>
+          <line x1="149" y1="23" x2="147" y2="23" stroke="#5a3c10" stroke-width="1"/>
+          <!-- Scarf / moustache suggestion -->
+          <path d="M 140 28 Q 148 31 156 28" stroke="#c8a870" stroke-width="1.5"
+                fill="none" stroke-linecap="round" opacity="0.6"/>
+
+          <!-- ============ STEERING TILLER ============ -->
+          <line x1="148" y1="38" x2="155" y2="50" stroke="#5a3c10" stroke-width="2.5"
+                stroke-linecap="round"/>
+          <ellipse cx="155" cy="50" rx="7" ry="4" fill="none"
+                   stroke="#6b4c0a" stroke-width="2"/>
+
+          <!-- ============ LAMPS (brass oil lamps) ============ -->
+          <!-- Left lamp -->
+          <rect x="36" y="44" width="10" height="14" rx="2" fill="#8b6510"/>
+          <rect x="37" y="45" width="8" height="12"  rx="1" fill="#c8900a"/>
+          <ellipse cx="41" cy="51" rx="3.5" ry="4" fill="rgba(255,230,100,0.7)"/>
+          <!-- Right lamp -->
+          <rect x="184" y="48" width="9"  height="12" rx="2" fill="#8b6510"/>
+          <rect x="185" y="49" width="7"  height="10" rx="1" fill="#c8900a"/>
+          <ellipse cx="188" cy="54" rx="3" ry="3.5"   fill="rgba(255,230,100,0.7)"/>
+
+          <!-- ============ DECORATIVE BRASS TRIM ============ -->
+          <!-- Bonnet strap -->
+          <line x1="38" y1="55" x2="58" y2="55" stroke="#c8900a" stroke-width="1.2" opacity="0.8"/>
+          <!-- Body trim line -->
+          <line x1="58" y1="46" x2="168" y2="46" stroke="#8b6510" stroke-width="0.8" opacity="0.5"/>
+
+          <!-- Number plate hint -->
+          <rect x="75" y="60" width="26" height="8" rx="1"
+                fill="#e8d5a8" stroke="#8b6510" stroke-width="0.7"/>
+          <text x="88" y="67" text-anchor="middle"
+                font-family="serif" font-size="5" fill="#3a2808">1900</text>
+        </svg>
+      </div>
+
+      <!-- Elapsed time display (minutes prominent) -->
+      <div class="elapsed-display">
+        <div class="mins-val" id="elapsedDisplay">0<span style="font-size:0.7em">m</span> 00<span style="font-size:0.7em">s</span></div>
+      </div>
+
+      <!-- Sub-dial (seconds register) -->
+      <div class="sub-dial">
+        <div class="sub-dial-ring"></div>
+        <svg id="subTickSvg" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="sub-hands">
+          <div class="hand sub-hand sec-hand" id="secHand"></div>
+          <div class="sub-center"></div>
+        </div>
+        <div class="sub-label">Secondes</div>
+      </div>
+
+      <!-- Main hands layer -->
+      <div class="hands">
+        <div class="hand minute-hand" id="minHand"></div>
+        <div class="center-jewel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-start" id="btnStart">Départ</button>
+    <button class="btn btn-stop"  id="btnStop">Arrêt</button>
+    <button class="btn btn-reset" id="btnReset">Remise</button>
+  </div>
+
+  <div class="status-line" id="status">· En attente ·</div>
+</div>
+
+<script>
+  // ── Build main dial tick marks (60 minute positions) ────────────────────────
+  const mainSvg = document.getElementById('tickSvg');
+  const cx = 173, cy = 173, r = 155;
+
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360 - 90;
+    const rad = angle * Math.PI / 180;
+    const isMajor = i % 5 === 0;
+    const r1 = r;
+    const r2 = r1 - (isMajor ? 16 : 8);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx + r1 * Math.cos(rad));
+    line.setAttribute('y1', cy + r1 * Math.sin(rad));
+    line.setAttribute('x2', cx + r2 * Math.cos(rad));
+    line.setAttribute('y2', cy + r2 * Math.sin(rad));
+    line.setAttribute('stroke', isMajor ? '#2a1800' : '#7a5820');
+    line.setAttribute('stroke-width', isMajor ? '2.5' : '1');
+    line.setAttribute('stroke-linecap', 'round');
+    mainSvg.appendChild(line);
+  }
+
+  // ── Minute numerals at every 5-min mark ──────────────────────────────────────
+  const numeralsEl = document.getElementById('numerals');
+  const numR = r - 28;
+  for (let i = 0; i < 60; i += 5) {
+    const angle = (i / 60) * 360 - 90;
+    const rad = angle * Math.PI / 180;
+    const pctX = 50 + (numR / 173) * Math.cos(rad) * 50;
+    const pctY = 50 + (numR / 173) * Math.sin(rad) * 50;
+    const el = document.createElement('div');
+    el.className = 'min-numeral';
+    el.style.left = pctX + '%';
+    el.style.top  = pctY + '%';
+    el.style.transform = 'translate(-50%,-50%)';
+    el.textContent = i === 0 ? '60' : i;
+    numeralsEl.appendChild(el);
+  }
+
+  // ── Build sub-dial tick marks (60-second positions) ──────────────────────────
+  const subSvg = document.getElementById('subTickSvg');
+  const scx = 36, scy = 36, sr = 30;
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360 - 90;
+    const rad = angle * Math.PI / 180;
+    const isMajor = i % 5 === 0;
+    const sr1 = sr, sr2 = sr1 - (isMajor ? 7 : 4);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', scx + sr1 * Math.cos(rad));
+    line.setAttribute('y1', scy + sr1 * Math.sin(rad));
+    line.setAttribute('x2', scx + sr2 * Math.cos(rad));
+    line.setAttribute('y2', scy + sr2 * Math.sin(rad));
+    line.setAttribute('stroke', isMajor ? '#2a1800' : '#7a5820');
+    line.setAttribute('stroke-width', isMajor ? '1.5' : '0.7');
+    line.setAttribute('stroke-linecap', 'round');
+    subSvg.appendChild(line);
+  }
+
+  // ── Stopwatch logic ──────────────────────────────────────────────────────────
+  let startTime = null, elapsed = 0, running = false, rafId = null;
+
+  const minHand       = document.getElementById('minHand');
+  const secHand       = document.getElementById('secHand');
+  const elapsedDisp   = document.getElementById('elapsedDisplay');
+  const statusEl      = document.getElementById('status');
+  const carArea       = document.getElementById('carArea');
+
+  function updateDisplay(ms) {
+    const totalSec = ms / 1000;
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+
+    // Main hand: one full rotation per 60 minutes (primary display)
+    const minDeg = ((mins % 60) + (secs / 60)) * 6; // 6° per minute
+    minHand.style.transform = `rotate(${minDeg}deg)`;
+
+    // Sub-dial second hand
+    const secDeg = secs * 6; // 6° per second
+    secHand.style.transform = `rotate(${secDeg}deg)`;
+
+    // Elapsed text — minutes prominently, seconds secondary
+    const m = Math.floor(mins);
+    const s = String(Math.floor(secs % 60)).padStart(2, '0');
+    elapsedDisp.innerHTML = `${m}<span style="font-size:0.7em">m</span> ${s}<span style="font-size:0.7em">s</span>`;
+  }
+
+  function tick() {
+    updateDisplay(elapsed + (performance.now() - startTime));
+    rafId = requestAnimationFrame(tick);
+  }
+
+  document.getElementById('btnStart').addEventListener('click', () => {
+    if (running) return;
+    running = true;
+    startTime = performance.now();
+    rafId = requestAnimationFrame(tick);
+    statusEl.textContent = '· En marche ·';
+    carArea.classList.remove('idle');
+  });
+
+  document.getElementById('btnStop').addEventListener('click', () => {
+    if (!running) return;
+    running = false;
+    elapsed += performance.now() - startTime;
+    cancelAnimationFrame(rafId);
+    statusEl.textContent = '· Arrêté ·';
+    carArea.classList.add('idle');
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed = 0;
+    startTime = null;
+    updateDisplay(0);
+    statusEl.textContent = '· En attente ·';
+    carArea.classList.add('idle');
+  });
+
+  // Start idle
+  carArea.classList.add('idle');
+  updateDisplay(0);
+</script>
+</body>
+</html>
