@@ -1,1 +1,566 @@
-https://claude.ai/api/organizations/56b2b489-8fbb-4e50-a8b7-bd3fab266830/files/255e27e6-5837-4828-81df-cd748e36cb7c/contents
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamster Stopwatch</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:wght@700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a0f00;
+      background-image:
+        radial-gradient(ellipse at center, #2d1a00 0%, #0d0600 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Special Elite', cursive;
+    }
+
+    .watch-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .title {
+      color: #c8a96e;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(200, 169, 110, 0.4);
+    }
+
+    /* Chain/crown at top */
+    .crown {
+      width: 40px;
+      height: 20px;
+      background: linear-gradient(135deg, #b8860b, #ffd700, #b8860b, #8b6914);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      margin-bottom: -10px;
+      z-index: 2;
+      box-shadow: 0 -2px 8px rgba(255,215,0,0.3);
+    }
+    .crown::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: 50%; transform: translateX(-50%);
+      width: 16px; height: 16px;
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255,215,0,0.5);
+    }
+
+    /* Main watch body */
+    .watch-body {
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #3d2800, #1a0f00);
+      border: 6px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      box-shadow:
+        0 0 0 3px #8b6914,
+        0 0 0 6px #ffd700,
+        0 0 0 9px #8b6914,
+        0 0 40px rgba(255, 215, 0, 0.2),
+        inset 0 0 60px rgba(0,0,0,0.5);
+    }
+
+    /* Outer decorative ring */
+    .watch-face {
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 30%, #f5e6c8, #d4b483, #8b6914, #5a3e0f);
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(255,255,255,0.3), inset 0 -4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Aged paper texture overlay */
+    .watch-face::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Minute track ring */
+    .minute-ring {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      border: 2px solid rgba(90, 62, 15, 0.5);
+    }
+
+    /* Tick marks */
+    .ticks {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .tick {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: 0 0;
+    }
+
+    .tick-line {
+      position: absolute;
+      width: 1.5px;
+      background: #3a2500;
+      transform-origin: bottom center;
+      left: -0.75px;
+    }
+
+    .tick-major .tick-line {
+      height: 14px;
+      width: 2.5px;
+      background: #2a1800;
+      left: -1.25px;
+    }
+
+    /* Hamster face area */
+    .hamster-area {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .hamster-svg {
+      width: 140px;
+      height: 130px;
+      margin-top: -10px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    /* Time display */
+    .time-display {
+      position: absolute;
+      bottom: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      background: rgba(245, 230, 200, 0.85);
+      border: 1.5px solid #8b6914;
+      border-radius: 6px;
+      padding: 3px 14px;
+      min-width: 130px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .time-display .mins {
+      font-family: 'Special Elite', cursive;
+      font-size: 1.5rem;
+      color: #2a1800;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .time-display .label {
+      font-size: 0.6rem;
+      color: #5a3e0f;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* Hands */
+    .hands {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .minute-hand {
+      width: 4px;
+      height: 105px;
+      background: linear-gradient(to top, #4a3000, #1a0f00);
+      margin-left: -2px;
+      border-radius: 3px 3px 2px 2px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    }
+
+    .second-hand {
+      width: 1.5px;
+      height: 108px;
+      background: #8b0000;
+      margin-left: -0.75px;
+    }
+
+    .second-hand::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1.5px;
+      height: 20px;
+      background: #8b0000;
+    }
+
+    /* Center cap */
+    .center-cap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle at 35% 35%, #ffd700, #8b6914);
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+
+    /* Hour numerals */
+    .numeral {
+      position: absolute;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.85rem;
+      color: #2a1800;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    /* Buttons */
+    .controls {
+      display: flex;
+      gap: 20px;
+    }
+
+    .btn {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 10px 28px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #4a7c3f, #2d5a24);
+      color: #d4edda;
+      box-shadow: 0 4px 0 #1a3a14, 0 0 15px rgba(74,124,63,0.3);
+    }
+    .btn-start:hover { transform: translateY(-1px); box-shadow: 0 5px 0 #1a3a14, 0 0 20px rgba(74,124,63,0.4); }
+    .btn-start:active { transform: translateY(2px); box-shadow: 0 2px 0 #1a3a14; }
+
+    .btn-stop {
+      background: linear-gradient(135deg, #8b3a3a, #5a1a1a);
+      color: #f5d0d0;
+      box-shadow: 0 4px 0 #3a0a0a, 0 0 15px rgba(139,58,58,0.3);
+    }
+    .btn-stop:hover { transform: translateY(-1px); box-shadow: 0 5px 0 #3a0a0a, 0 0 20px rgba(139,58,58,0.4); }
+    .btn-stop:active { transform: translateY(2px); box-shadow: 0 2px 0 #3a0a0a; }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #6b5a2d, #3d3010);
+      color: #f5e6c8;
+      box-shadow: 0 4px 0 #1a1400, 0 0 15px rgba(107,90,45,0.3);
+    }
+    .btn-reset:hover { transform: translateY(-1px); }
+    .btn-reset:active { transform: translateY(2px); box-shadow: 0 2px 0 #1a1400; }
+
+    /* Status */
+    .status {
+      color: #c8a96e;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      height: 16px;
+      text-shadow: 0 0 10px rgba(200,169,110,0.5);
+    }
+
+    /* Cheek puff animation when running */
+    @keyframes puff {
+      0%, 100% { rx: 22; ry: 20; }
+      50% { rx: 24; ry: 22; }
+    }
+    .cheek-puff { animation: puff 1.2s ease-in-out infinite; }
+
+    /* Eye blink */
+    @keyframes blink {
+      0%, 94%, 100% { transform: scaleY(1); }
+      97% { transform: scaleY(0.08); }
+    }
+    .eye-group { animation: blink 4s ease-in-out infinite; transform-origin: center; }
+
+    /* Whisker twitch */
+    @keyframes twitch {
+      0%, 100% { transform: rotate(0deg); }
+      30% { transform: rotate(3deg); }
+      60% { transform: rotate(-2deg); }
+    }
+    .whiskers { animation: twitch 2.5s ease-in-out infinite; transform-origin: center; }
+  </style>
+</head>
+<body>
+
+<div class="watch-container">
+  <div class="title">The Hamster Chronograph</div>
+
+  <div class="crown"></div>
+
+  <div class="watch-body">
+    <div class="watch-face" id="watchFace">
+      <div class="minute-ring"></div>
+
+      <!-- Tick marks rendered by JS -->
+      <div class="ticks" id="ticks"></div>
+
+      <!-- Numerals rendered by JS -->
+      <div id="numerals"></div>
+
+      <!-- Hamster face -->
+      <div class="hamster-area">
+        <svg class="hamster-svg" viewBox="0 0 140 130" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ear left -->
+          <ellipse cx="30" cy="28" rx="18" ry="16" fill="#d4956a"/>
+          <ellipse cx="30" cy="28" rx="11" ry="10" fill="#f5b8a0"/>
+          <!-- Ear right -->
+          <ellipse cx="110" cy="28" rx="18" ry="16" fill="#d4956a"/>
+          <ellipse cx="110" cy="28" rx="11" ry="10" fill="#f5b8a0"/>
+
+          <!-- Head -->
+          <ellipse cx="70" cy="60" rx="52" ry="46" fill="#e8a878"/>
+
+          <!-- Cheek pouches (chubby) -->
+          <ellipse class="cheek-puff" cx="22" cy="68" rx="22" ry="20" fill="#f0b890"/>
+          <ellipse class="cheek-puff" cx="118" cy="68" rx="22" ry="20" fill="#f0b890"/>
+
+          <!-- Face overlay -->
+          <ellipse cx="70" cy="62" rx="42" ry="38" fill="#ecca9a"/>
+
+          <!-- Forehead marking -->
+          <ellipse cx="70" cy="40" rx="22" ry="12" fill="#d4956a" opacity="0.4"/>
+
+          <!-- Eyes -->
+          <g class="eye-group">
+            <ellipse cx="52" cy="58" rx="9" ry="10" fill="#1a0800"/>
+            <ellipse cx="118" cy="58" rx="9" ry="10" fill="#1a0800" transform="translate(-12,0)"/>
+            <!-- Highlights -->
+            <circle cx="55" cy="55" r="3" fill="white"/>
+            <circle cx="109" cy="55" r="3" fill="white"/>
+            <!-- Pupils -->
+            <circle cx="52" cy="59" r="5" fill="#0a0400"/>
+            <circle cx="106" cy="59" r="5" fill="#0a0400"/>
+          </g>
+
+          <!-- Nose -->
+          <ellipse cx="70" cy="76" rx="7" ry="5" fill="#c06080"/>
+
+          <!-- Mouth -->
+          <path d="M 70 81 Q 62 88 58 85" stroke="#8b4050" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M 70 81 Q 78 88 82 85" stroke="#8b4050" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+          <!-- Whiskers left -->
+          <g class="whiskers">
+            <line x1="58" y1="74" x2="20" y2="68" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+            <line x1="58" y1="77" x2="18" y2="76" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+            <line x1="58" y1="80" x2="22" y2="86" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+          </g>
+          <!-- Whiskers right -->
+          <g class="whiskers">
+            <line x1="82" y1="74" x2="120" y2="68" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+            <line x1="82" y1="77" x2="122" y2="76" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+            <line x1="82" y1="80" x2="118" y2="86" stroke="#3a2000" stroke-width="1.2" opacity="0.7"/>
+          </g>
+
+          <!-- Tiny top teeth -->
+          <rect x="65" y="82" width="5" height="6" rx="1" fill="#f5f0e0"/>
+          <rect x="71" y="82" width="5" height="6" rx="1" fill="#f5f0e0"/>
+
+          <!-- Vintage spectacles -->
+          <circle cx="52" cy="58" r="13" fill="none" stroke="#8b6914" stroke-width="1.5" opacity="0.6"/>
+          <circle cx="106" cy="58" r="13" fill="none" stroke="#8b6914" stroke-width="1.5" opacity="0.6"/>
+          <line x1="65" y1="58" x2="93" y2="58" stroke="#8b6914" stroke-width="1.5" opacity="0.6"/>
+          <line x1="39" y1="56" x2="30" y2="52" stroke="#8b6914" stroke-width="1.5" opacity="0.6"/>
+          <line x1="119" y1="56" x2="128" y2="52" stroke="#8b6914" stroke-width="1.5" opacity="0.6"/>
+        </svg>
+      </div>
+
+      <!-- Time display window -->
+      <div class="time-display">
+        <div class="mins" id="timeDisplay">00:00</div>
+        <div class="label">min &nbsp;·&nbsp; sec</div>
+      </div>
+
+      <!-- Clock hands -->
+      <div class="hands">
+        <div class="hand minute-hand" id="minuteHand"></div>
+        <div class="hand second-hand" id="secondHand"></div>
+        <div class="center-cap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-start" id="btnStart">Start</button>
+    <button class="btn btn-stop" id="btnStop">Stop</button>
+    <button class="btn btn-reset" id="btnReset">Reset</button>
+  </div>
+
+  <div class="status" id="status">· Ready ·</div>
+</div>
+
+<script>
+  // Build tick marks
+  const ticksEl = document.getElementById('ticks');
+  const numeralsEl = document.getElementById('numerals');
+  const cx = 168, cy = 168, r = 148;
+
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360 - 90;
+    const rad = angle * Math.PI / 180;
+    const isMajor = i % 5 === 0;
+    const tickLen = isMajor ? 14 : 8;
+    const r1 = r - 4;
+    const r2 = r1 - tickLen;
+
+    const x1 = cx + r1 * Math.cos(rad);
+    const y1 = cy + r1 * Math.sin(rad);
+    const x2 = cx + r2 * Math.cos(rad);
+    const y2 = cy + r2 * Math.sin(rad);
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    // Use canvas for ticks instead — draw as positioned divs
+    const div = document.createElement('div');
+    div.className = 'tick' + (isMajor ? ' tick-major' : '');
+
+    // Place numerals at major ticks (every 5 min = 12 positions)
+    if (isMajor) {
+      const numR = r - 28;
+      const nx = 50 + ((numR / r) * (x1 - cx + numR * Math.cos(rad) * 0) / 1.68);
+      // Simpler: compute percentage position
+      const pctX = 50 + (numR / 168) * Math.cos(rad) * 50;
+      const pctY = 50 + (numR / 168) * Math.sin(rad) * 50;
+      const numEl = document.createElement('div');
+      numEl.className = 'numeral';
+      numEl.style.left = pctX + '%';
+      numEl.style.top = pctY + '%';
+      numEl.style.transform = 'translate(-50%, -50%)';
+      numEl.textContent = i === 0 ? '60' : i;
+      numeralsEl.appendChild(numEl);
+    }
+  }
+
+  // Use SVG for ticks for precision
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 336 336');
+  svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;';
+  ticksEl.appendChild(svg);
+
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360 - 90;
+    const rad = angle * Math.PI / 180;
+    const isMajor = i % 5 === 0;
+    const r1 = 148;
+    const r2 = r1 - (isMajor ? 14 : 7);
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx + r1 * Math.cos(rad));
+    line.setAttribute('y1', cy + r1 * Math.sin(rad));
+    line.setAttribute('x2', cx + r2 * Math.cos(rad));
+    line.setAttribute('y2', cy + r2 * Math.sin(rad));
+    line.setAttribute('stroke', isMajor ? '#2a1800' : '#5a3e0f');
+    line.setAttribute('stroke-width', isMajor ? '2.5' : '1.2');
+    line.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(line);
+  }
+
+  // Stopwatch logic
+  let startTime = null;
+  let elapsed = 0;
+  let running = false;
+  let rafId = null;
+
+  const minuteHand = document.getElementById('minuteHand');
+  const secondHand = document.getElementById('secondHand');
+  const timeDisplay = document.getElementById('timeDisplay');
+  const status = document.getElementById('status');
+
+  function updateDisplay(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+
+    // Minute hand: full rotation = 60 minutes
+    const minDeg = (mins % 60 + secs / 60) * 6; // 360/60 = 6 deg per min
+    // Second hand: full rotation = 60 seconds
+    const secDeg = (secs + (ms % 1000) / 1000) * 6;
+
+    minuteHand.style.transform = `rotate(${minDeg}deg)`;
+    secondHand.style.transform = `rotate(${secDeg}deg)`;
+
+    const m = String(mins).padStart(2, '0');
+    const s = String(secs).padStart(2, '0');
+    timeDisplay.textContent = `${m}:${s}`;
+  }
+
+  function tick() {
+    const now = performance.now();
+    const total = elapsed + (now - startTime);
+    updateDisplay(total);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  document.getElementById('btnStart').addEventListener('click', () => {
+    if (running) return;
+    running = true;
+    startTime = performance.now();
+    rafId = requestAnimationFrame(tick);
+    status.textContent = '· Running ·';
+  });
+
+  document.getElementById('btnStop').addEventListener('click', () => {
+    if (!running) return;
+    running = false;
+    elapsed += performance.now() - startTime;
+    cancelAnimationFrame(rafId);
+    status.textContent = '· Stopped ·';
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed = 0;
+    startTime = null;
+    updateDisplay(0);
+    status.textContent = '· Ready ·';
+  });
+</script>
+</body>
+</html>
