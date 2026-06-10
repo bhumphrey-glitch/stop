@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hamster Stopwatch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a0f00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Special Elite', serif;
+    background-image:
+      radial-gradient(ellipse at center, #2d1a00 0%, #1a0f00 70%);
+  }
+
+  h1 {
+    color: #c8a45a;
+    font-size: 1.4rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    text-shadow: 0 0 12px #a07820;
+  }
+
+  .watch-body {
+    position: relative;
+    width: 340px;
+    height: 340px;
+  }
+
+  .crown {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 32px;
+    background: linear-gradient(180deg, #d4aa50 0%, #8a6520 60%, #c09030 100%);
+    border-radius: 8px 8px 4px 4px;
+    border: 2px solid #7a5510;
+    box-shadow: inset 0 2px 4px rgba(255,220,100,0.4);
+    z-index: 10;
+  }
+  .crown::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 4px; right: 4px;
+    height: 3px;
+    background: rgba(255,220,100,0.3);
+    border-radius: 2px;
+    box-shadow: 0 6px 0 rgba(255,220,100,0.2), 0 12px 0 rgba(255,220,100,0.15);
+  }
+
+  .btn-left, .btn-right {
+    position: absolute;
+    top: 80px;
+    width: 22px;
+    height: 40px;
+    background: linear-gradient(180deg, #d4aa50, #8a6520);
+    border-radius: 4px;
+    border: 1.5px solid #7a5510;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  }
+  .btn-left { left: -14px; }
+  .btn-right { right: -14px; }
+  .btn-left:active, .btn-right:active { transform: scaleY(0.95); }
+
+  .watch-case {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #c8a030 0%, #7a5010 40%, #c8a030 70%, #9a7020 100%);
+    box-shadow:
+      0 0 0 4px #6a4000,
+      0 0 0 6px #c8a030,
+      0 8px 40px rgba(0,0,0,0.8),
+      inset 0 2px 8px rgba(255,220,100,0.3);
+  }
+
+  .bezel {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a1200, #3a2800, #1a1200);
+    box-shadow:
+      inset 0 0 20px rgba(0,0,0,0.8),
+      inset 0 0 6px rgba(200,160,50,0.2),
+      0 0 0 2px #5a3a00;
+  }
+
+  .face {
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 40% 35%, #f5ead0 0%, #e8d5a0 40%, #c8b070 100%);
+    overflow: hidden;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.25);
+  }
+
+  .ear {
+    position: absolute;
+    width: 44px;
+    height: 38px;
+    background: radial-gradient(ellipse, #e8c8a0 40%, #c8a070 100%);
+    border-radius: 50%;
+    top: 10px;
+    border: 1px solid #b89060;
+  }
+  .ear-inner {
+    position: absolute;
+    width: 26px;
+    height: 22px;
+    background: radial-gradient(ellipse, #f0b0a0 30%, #d89080 100%);
+    border-radius: 50%;
+    top: 6px;
+    left: 9px;
+  }
+  .ear-left { left: 16px; transform: rotate(-15deg); }
+  .ear-right { right: 16px; transform: rotate(15deg); }
+
+  .eye {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle at 35% 35%, #4a3010 0%, #1a0800 60%, #000 100%);
+    border-radius: 50%;
+    top: 68px;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.6), inset 0 1px 3px rgba(255,255,255,0.3);
+  }
+  .eye::after {
+    content: '';
+    position: absolute;
+    width: 5px; height: 5px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    top: 2px; left: 3px;
+  }
+  .eye-left { left: 66px; }
+  .eye-right { right: 66px; }
+
+  .cheek {
+    position: absolute;
+    width: 54px;
+    height: 44px;
+    background: radial-gradient(ellipse at 50% 40%, #f0c090 0%, #d8a060 100%);
+    border-radius: 50%;
+    top: 90px;
+    border: 1px solid #c09050;
+    box-shadow: inset 0 2px 6px rgba(180,120,50,0.3);
+  }
+  .cheek-left { left: 28px; }
+  .cheek-right { right: 28px; }
+
+  .nose {
+    position: absolute;
+    width: 14px;
+    height: 10px;
+    background: radial-gradient(ellipse, #e08090 30%, #c06070 100%);
+    border-radius: 50%;
+    top: 108px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .mouth {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 14px;
+    border-bottom: 2px solid #c08070;
+    border-left: 2px solid #c08070;
+    border-right: 2px solid #c08070;
+    border-radius: 0 0 50% 50%;
+    background: transparent;
+  }
+
+  .whisker {
+    position: absolute;
+    height: 1.5px;
+    background: rgba(120,80,40,0.5);
+    border-radius: 2px;
+    top: 116px;
+  }
+  .whisker-l1 { width: 36px; left: 20px; transform: rotate(-8deg); }
+  .whisker-l2 { width: 34px; left: 18px; top: 122px; transform: rotate(2deg); }
+  .whisker-l3 { width: 30px; left: 20px; top: 128px; transform: rotate(10deg); }
+  .whisker-r1 { width: 36px; right: 20px; transform: rotate(8deg); }
+  .whisker-r2 { width: 34px; right: 18px; top: 122px; transform: rotate(-2deg); }
+  .whisker-r3 { width: 30px; right: 20px; top: 128px; transform: rotate(-10deg); }
+
+  .numeral {
+    position: absolute;
+    font-family: 'Special Elite', serif;
+    font-size: 13px;
+    color: #5a3a10;
+    font-weight: bold;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    transform: translate(-50%, -50%);
+  }
+
+  .tick {
+    position: absolute;
+    width: 1.5px;
+    background: rgba(90,58,16,0.5);
+    transform-origin: bottom center;
+    left: 50%;
+    bottom: 50%;
+  }
+
+  .hand-container { position: absolute; inset: 0; }
+
+  .hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .minute-hand {
+    width: 3px;
+    height: 82px;
+    background: linear-gradient(180deg, #2a1800 0%, #5a3a10 100%);
+    margin-left: -1.5px;
+    box-shadow: 0 0 3px rgba(0,0,0,0.4);
+    border-radius: 3px 3px 2px 2px;
+  }
+
+  .second-hand {
+    width: 1.5px;
+    height: 88px;
+    background: #c02020;
+    margin-left: -0.75px;
+    box-shadow: 0 0 2px rgba(200,0,0,0.5);
+  }
+  .second-hand::after {
+    content: '';
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 20px;
+    background: #c02020;
+  }
+
+  .hour-hand {
+    width: 4px;
+    height: 52px;
+    background: linear-gradient(180deg, #1a0800, #4a2a08);
+    margin-left: -2px;
+    border-radius: 4px 4px 2px 2px;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  }
+
+  .center-cap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 35% 35%, #e8c050, #9a7010);
+    border-radius: 50%;
+    border: 2px solid #6a4800;
+    z-index: 20;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  .display {
+    position: absolute;
+    bottom: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20,12,0,0.85);
+    border: 1px solid #8a6020;
+    border-radius: 4px;
+    padding: 3px 10px;
+    min-width: 90px;
+    text-align: center;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.5), 0 0 8px rgba(200,160,50,0.15);
+    z-index: 15;
+  }
+  .display-time {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    color: #d4aa40;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 6px rgba(212,170,64,0.8);
+  }
+  .display-label {
+    font-size: 8px;
+    color: #8a6030;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .controls {
+    margin-top: 28px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .ctrl-btn {
+    background: linear-gradient(180deg, #c8a030 0%, #7a5010 100%);
+    border: 2px solid #5a3a00;
+    border-radius: 8px;
+    color: #1a0f00;
+    font-family: 'Special Elite', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    padding: 10px 22px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,220,100,0.4);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .ctrl-btn:hover { background: linear-gradient(180deg, #d8b040 0%, #9a6020 100%); }
+  .ctrl-btn:active { transform: translateY(2px); box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+
+  .lap-list {
+    margin-top: 20px;
+    max-height: 120px;
+    overflow-y: auto;
+    width: 340px;
+  }
+  .lap-list::-webkit-scrollbar { width: 4px; }
+  .lap-list::-webkit-scrollbar-track { background: #1a0f00; }
+  .lap-list::-webkit-scrollbar-thumb { background: #8a6020; border-radius: 2px; }
+
+  .lap-item {
+    display: flex;
+    justify-content: space-between;
+    color: #c8a45a;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    padding: 3px 12px;
+    border-bottom: 1px solid rgba(200,160,50,0.1);
+  }
+  .lap-item:nth-child(even) { background: rgba(200,160,50,0.04); }
+  .lap-num { color: #8a6030; }
+
+  .face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 30% 25%, rgba(255,255,255,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Hamster Timer</h1>
+
+<div class="watch-body">
+  <div class="crown"></div>
+  <div class="btn-left" title="Lap" onclick="lap()"></div>
+  <div class="btn-right" title="Reset" onclick="reset()"></div>
+  <div class="watch-case">
+    <div class="bezel">
+      <div class="face" id="face">
+        <div class="ear ear-left"><div class="ear-inner"></div></div>
+        <div class="ear ear-right"><div class="ear-inner"></div></div>
+        <div class="eye eye-left"></div>
+        <div class="eye eye-right"></div>
+        <div class="cheek cheek-left"></div>
+        <div class="cheek cheek-right"></div>
+        <div class="nose"></div>
+        <div class="mouth"></div>
+        <div class="whisker whisker-l1"></div>
+        <div class="whisker whisker-l2"></div>
+        <div class="whisker whisker-l3"></div>
+        <div class="whisker whisker-r1"></div>
+        <div class="whisker whisker-r2"></div>
+        <div class="whisker whisker-r3"></div>
+        <div id="ticks"></div>
+        <div id="numerals"></div>
+        <div class="hand-container" id="hands">
+          <div class="hand hour-hand" id="hourHand" style="transform: rotate(0deg);"></div>
+          <div class="hand minute-hand" id="minuteHand" style="transform: rotate(0deg);"></div>
+          <div class="hand second-hand" id="secondHand" style="transform: rotate(0deg);"></div>
+        </div>
+        <div class="center-cap"></div>
+        <div class="display">
+          <div class="display-time" id="displayTime">00:00</div>
+          <div class="display-label">min : sec</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="startBtn" onclick="startStop()">Start</button>
+  <button class="ctrl-btn" onclick="lap()">Lap</button>
+  <button class="ctrl-btn" onclick="reset()">Reset</button>
+</div>
+
+<div class="lap-list" id="lapList"></div>
+
+<script>
+  const ticksEl = document.getElementById('ticks');
+  const numeralsEl = document.getElementById('numerals');
+  const faceSize = 290;
+  const cx = faceSize / 2;
+  const cy = faceSize / 2;
+
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * 360;
+    const isMajor = i % 5 === 0;
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    const h = isMajor ? 10 : 5;
+    const r = faceSize / 2 - 10;
+    tick.style.height = h + 'px';
+    tick.style.width = isMajor ? '2px' : '1px';
+    tick.style.marginLeft = isMajor ? '-1px' : '-0.5px';
+    const rad = (angle - 90) * Math.PI / 180;
+    const tx = cx + r * Math.cos(rad) - (isMajor ? 1 : 0.5);
+    const ty = cy + r * Math.sin(rad);
+    tick.style.position = 'absolute';
+    tick.style.left = tx + 'px';
+    tick.style.top = (ty - h) + 'px';
+    tick.style.bottom = 'auto';
+    tick.style.transformOrigin = 'center bottom';
+    tick.style.transform = `rotate(${angle}deg)`;
+    tick.style.background = isMajor ? 'rgba(90,58,16,0.7)' : 'rgba(90,58,16,0.35)';
+    tick.style.borderRadius = '1px';
+    ticksEl.appendChild(tick);
+  }
+
+  for (let i = 1; i <= 12; i++) {
+    const minVal = i * 5;
+    const angle = (minVal / 60) * 360;
+    const rad = (angle - 90) * Math.PI / 180;
+    const r = faceSize / 2 - 24;
+    const x = cx + r * Math.cos(rad);
+    const y = cy + r * Math.sin(rad);
+    const num = document.createElement('div');
+    num.className = 'numeral';
+    num.textContent = minVal === 60 ? '60' : minVal;
+    num.style.left = x + 'px';
+    num.style.top = y + 'px';
+    if (minVal >= 25 && minVal <= 35) num.style.opacity = '0';
+    numeralsEl.appendChild(num);
+  }
+
+  let running = false, startTime = 0, elapsed = 0, lapCount = 0, lapStart = 0, rafId = null;
+  const minuteHand = document.getElementById('minuteHand');
+  const secondHand = document.getElementById('secondHand');
+  const hourHand = document.getElementById('hourHand');
+  const displayTime = document.getElementById('displayTime');
+  const startBtn = document.getElementById('startBtn');
+  const lapList = document.getElementById('lapList');
+
+  function formatTime(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  }
+
+  function update() {
+    if (!running) return;
+    elapsed = performance.now() - startTime;
+    const totalSec = elapsed / 1000;
+    const minutes = totalSec / 60;
+    const seconds = totalSec % 60;
+    minuteHand.style.transform = `rotate(${(minutes % 60) * 6}deg)`;
+    secondHand.style.transform = `rotate(${(seconds / 60) * 360}deg)`;
+    hourHand.style.transform = `rotate(${(minutes % 60) / 60 * 360}deg)`;
+    displayTime.textContent = formatTime(elapsed);
+    rafId = requestAnimationFrame(update);
+  }
+
+  function startStop() {
+    if (running) {
+      running = false;
+      elapsed = performance.now() - startTime;
+      cancelAnimationFrame(rafId);
+      startBtn.textContent = 'Start';
+    } else {
+      startTime = performance.now() - elapsed;
+      running = true;
+      if (lapCount === 0) lapStart = startTime;
+      rafId = requestAnimationFrame(update);
+      startBtn.textContent = 'Stop';
+    }
+  }
+
+  function lap() {
+    if (!running && elapsed === 0) return;
+    lapCount++;
+    const now = running ? performance.now() : (startTime + elapsed);
+    const lapElapsed = now - lapStart;
+    lapStart = now;
+    const item = document.createElement('div');
+    item.className = 'lap-item';
+    item.innerHTML = `<span class="lap-num">Lap ${lapCount}</span><span>${formatTime(lapElapsed)}</span><span>${formatTime(elapsed)}</span>`;
+    lapList.prepend(item);
+  }
+
+  function reset() {
+    running = false;
+    cancelAnimationFrame(rafId);
+    elapsed = 0; lapCount = 0; lapStart = 0;
+    minuteHand.style.transform = 'rotate(0deg)';
+    secondHand.style.transform = 'rotate(0deg)';
+    hourHand.style.transform = 'rotate(0deg)';
+    displayTime.textContent = '00:00';
+    startBtn.textContent = 'Start';
+    lapList.innerHTML = '';
+  }
+</script>
+</body>
+</html>
